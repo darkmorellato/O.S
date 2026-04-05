@@ -3,52 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de Ordem de Serviço MiPlace - Assistência técnica especializada em celulares">
+    <meta name="keywords" content="ordem de serviço, assistência técnica, celulares, reparo, MiPlace">
+    <meta name="author" content="MiPlace">
+    <meta name="robots" content="noindex, nofollow">
     <title>Ordem de Serviço MiPlace</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Estilos CSS personalizados para uma visualização responsiva em tela */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; /* Cor de fundo suave */
-            min-height: 100vh;
-        }
-
-        /* Estilos de impressão para o formato A4 */
-        @media print {
-            body {
-                background-color: #fff;
-            }
-            .a4-container {
-                box-shadow: none;
-                max-width: 210mm;
-                margin: 0;
-                padding: 10mm;
-                height: auto;
-                overflow-y: visible;
-                /* Remove as propriedades de visualização para não afetar a impressão */
-                width: auto;
-                height: auto;
-            }
-            .download-button {
-                display: none !important; /* Esconde o botão de download na impressão */
-            }
-            input[type="text"], input[type="email"], textarea {
-                background-color: transparent !important;
-                border: none !important;
-                border-bottom: 1px solid #000 !important;
-                padding: 0;
-            }
-            ul {
-                list-style-type: disc;
-                list-style-position: inside;
-            }
-        }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-gray-100">
 
-    <!-- Container principal com a Ordem de Serviço, agora preenchendo toda a tela -->
-    <div class="bg-white rounded-xl p-8 w-full shadow-xl">
+    <!-- Tela de Boas-Vindas -->
+    <div id="welcome-screen" class="welcome-screen">
+        <div class="welcome-card">
+            <div class="welcome-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+            </div>
+            <h1 class="welcome-title">MiPlace</h1>
+            <p class="welcome-subtitle">Sistema de Ordem de Serviço</p>
+            <div class="welcome-divider"></div>
+            <p class="welcome-description">Gerencie seus atendimentos de forma rápida e profissional.</p>
+            <button onclick="iniciarNovaOS()" class="welcome-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Nova Ordem de Serviço
+            </button>
+        </div>
+    </div>
+
+    <div id="os-wrapper">
+        <!-- Container principal com a Ordem de Serviço -->
+        <div id="os-content" class="bg-white rounded-xl p-8 shadow-xl" style="display: none;">
 
         <!-- Seção do Cabeçalho com o logo e o título -->
         <header class="flex items-center justify-between border-b-2 border-lime-500 pb-2 mb-4">
@@ -59,10 +52,19 @@
                 <!-- Título principal -->
                 <h1 class="text-2xl font-extrabold text-gray-900">ORDEM DE SERVIÇO MI PLACE</h1>
             </div>
+            <div class="text-right">
+                <div class="text-xs text-gray-600">Nº OS</div>
+                <div id="os-number" class="text-lg font-bold text-lime-600">000001</div>
+            </div>
         </header>
 
         <!-- Seção do conteúdo principal -->
         <main class="text-gray-700 text-sm">
+            <!-- Alerta de salvamento automático -->
+            <div id="autosave-notification" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4 text-xs">
+                Dados salvos automaticamente!
+            </div>
+            
             <!-- Título da seção de termos e condições -->
             <h2 class="text-xs font-semibold mb-3 text-gray-800">TERMOS E CONDIÇÕES DE PRESTAÇÃO DE SERVIÇOS</h2>
             
@@ -82,12 +84,12 @@
             <h3 class="font-bold text-gray-800 mb-1">3. Condições que Anulam a Garantia</h3>
             <p class="mb-3">
                 Qualquer garantia (seja a nossa, de serviço, ou a do fabricante, de produto) será imediatamente invalidada se o equipamento apresentar evidências de:
-                <ul class="list-disc list-inside ml-4 mt-2">
-                    <li>Mau uso (quedas, impactos, sobrecarga).</li>
-                    <li>Exposição a líquidos, umidade ou variação de energia.</li>
-                    <li>Modificação de software, aplicativos não oficiais, intervenção técnica por terceiros, que não a nossa assistência.</li>
-                </ul>
             </p>
+            <ul class="list-disc list-inside ml-4 mt-2 mb-3">
+                <li>Mau uso (quedas, impactos, sobrecarga).</li>
+                <li>Exposição a líquidos, umidade ou variação de energia.</li>
+                <li>Modificação de software, aplicativos não oficiais, intervenção técnica por terceiros, que não a nossa assistência.</li>
+            </ul>
 
             <!-- Espaço adicionado aqui -->
             <br>
@@ -106,294 +108,317 @@
         </main>
         
         <!-- Seção de Dados do Cliente e do Aparelho -->
-        <div class="mt-6 border-t-2 border-lime-500 pt-4">
+        <form id="os-form" class="border-t-2 border-lime-500 pt-2">
+            <div class="dados-grid">
             <!-- Dados do Cliente -->
+            <div class="dados-cliente">
             <div class="bg-gray-200 p-2 rounded-t-lg">
                 <h3 class="text-xs font-bold text-gray-900">DADOS DO CLIENTE</h3>
             </div>
             <div class="p-4 border-2 border-gray-300 rounded-b-lg">
+                <!-- Linha 1: Nome e CPF/CNPJ -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                    <div class="flex flex-col">
+                        <label for="nome-cliente" class="text-xs font-semibold text-gray-700">Nome completo ou Razão Social: <span class="text-red-500">*</span></label>
+                        <input type="text" id="nome-cliente" name="nome" required class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="cpf-cnpj" class="text-xs font-semibold text-gray-700">CPF ou CNPJ: <span class="text-red-500">*</span></label>
+                        <input type="text" id="cpf-cnpj" name="cpf_cnpj" required class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500" placeholder="000.000.000-00 ou 00.000.000/0001-00">
+                    </div>
+                </div>
+                <!-- Linha 2: CEP, Cidade, Estado -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                    <div class="flex flex-col">
+                        <label for="cep" class="text-xs font-semibold text-gray-700">CEP: <span class="text-red-500">*</span></label>
+                        <input type="text" id="cep" name="cep" required class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500" placeholder="00000-000">
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="cidade" class="text-xs font-semibold text-gray-700">Cidade:</label>
+                        <input type="text" id="cidade" name="cidade" class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="estado" class="text-xs font-semibold text-gray-700">Estado:</label>
+                        <input type="text" id="estado" name="estado" class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500" placeholder="SP">
+                    </div>
+                </div>
+                <!-- Linha 3: Endereço, Número, Complemento -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 mb-3">
+                    <div class="flex flex-col md:col-span-7">
+                        <label for="endereco" class="text-xs font-semibold text-gray-700">Endereço:</label>
+                        <input type="text" id="endereco" name="endereco" class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
+                    </div>
+                    <div class="flex flex-col md:col-span-2">
+                        <label for="numero" class="text-xs font-semibold text-gray-700">Número: <span class="text-red-500">*</span></label>
+                        <input type="text" id="numero" name="numero" required class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
+                    </div>
+                    <div class="flex flex-col md:col-span-3">
+                        <label for="complemento" class="text-xs font-semibold text-gray-700">Complemento:</label>
+                        <input type="text" id="complemento" name="complemento" class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
+                    </div>
+                </div>
+                <!-- Linha 4: Telefone e Email -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div class="flex flex-col">
-                        <label class="text-xs font-semibold text-gray-700">Nome completo ou Razão Social:</label>
-                        <input type="text" class="mt-1 p-1 border border-gray-300 rounded-md">
+                        <label for="telefone" class="text-xs font-semibold text-gray-700">Telefone: <span class="text-red-500">*</span></label>
+                        <input type="tel" id="telefone" name="telefone" required class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500" placeholder="(00)00000-0000" maxlength="15">
                     </div>
                     <div class="flex flex-col">
-                        <label class="text-xs font-semibold text-gray-700">CPF ou CNPJ:</label>
-                        <input type="text" class="mt-1 p-1 border border-gray-300 rounded-md">
-                    </div>
-                    <div class="flex flex-col">
-                        <label class="text-xs font-semibold text-gray-700">Endereço completo:</label>
-                        <input type="text" class="mt-1 p-1 border border-gray-300 rounded-md">
-                    </div>
-                    <div class="flex flex-col">
-                        <label class="text-xs font-semibold text-gray-700">Cidade e Estado:</label>
-                        <input type="text" class="mt-1 p-1 border border-gray-300 rounded-md">
-                    </div>
-                    <div class="flex flex-col">
-                        <label class="text-xs font-semibold text-gray-700">Número de Contato para falar com o Cliente:</label>
-                        <input type="text" class="mt-1 p-1 border border-gray-300 rounded-md">
-                    </div>
-                    <div class="flex flex-col">
-                        <label class="text-xs font-semibold text-gray-700">Email:</label>
-                        <input type="email" class="mt-1 p-1 border border-gray-300 rounded-md">
+                        <label for="email" class="text-xs font-semibold text-gray-700">Email:</label>
+                        <input type="email" id="email" name="email" class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500" placeholder="email@exemplo.com">
                     </div>
                 </div>
             </div>
+            </div>
 
             <!-- Dados do Aparelho -->
+            <div class="dados-aparelho">
             <div class="bg-gray-200 p-2 rounded-t-lg mt-4">
                 <h3 class="text-xs font-bold text-gray-900">DADOS DO APARELHO</h3>
             </div>
             <div class="p-4 border-2 border-gray-300 rounded-b-lg">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div class="flex flex-col">
-                        <label class="text-xs font-semibold text-gray-700">Modelo:</label>
-                        <input type="text" class="mt-1 p-1 border border-gray-300 rounded-md">
+                <!-- Linha 1: Marca, Modelo, Cor, IMEI -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 mb-3">
+                    <div class="flex flex-col md:col-span-2">
+                        <label for="marca" class="text-xs font-semibold text-gray-700">Marca: <span class="text-red-500">*</span></label>
+                        <input type="text" id="marca" name="marca" required class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
                     </div>
-                    <div class="flex flex-col">
-                        <label class="text-xs font-semibold text-gray-700">Marca:</label>
-                        <input type="text" class="mt-1 p-1 border border-gray-300 rounded-md">
+                    <div class="flex flex-col md:col-span-4">
+                        <label for="modelo" class="text-xs font-semibold text-gray-700">Modelo: <span class="text-red-500">*</span></label>
+                        <input type="text" id="modelo" name="modelo" required class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
                     </div>
-                    <div class="flex flex-col">
-                        <label class="text-xs font-semibold text-gray-700">IMEI:</label>
-                        <input type="text" class="mt-1 p-1 border border-gray-300 rounded-md">
+                    <div class="flex flex-col md:col-span-2">
+                        <label for="cor" class="text-xs font-semibold text-gray-700">Cor:</label>
+                        <input type="text" id="cor" name="cor" class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
                     </div>
-                    <div class="flex flex-col">
-                        <label class="text-xs font-semibold text-gray-700">Senha:</label>
-                        <input type="text" class="mt-1 p-1 border border-gray-300 rounded-md">
+                    <div class="flex flex-col md:col-span-4">
+                        <label for="imei" class="text-xs font-semibold text-gray-700">IMEI:</label>
+                        <input type="text" id="imei" name="imei" class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500" maxlength="15">
                     </div>
-                    <div class="flex flex-col">
-                        <label class="text-xs font-semibold text-gray-700">Cor:</label>
-                        <input type="text" class="mt-1 p-1 border border-gray-300 rounded-md">
+                </div>
+                <!-- Linha 2: Senha -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                    <div class="flex flex-col md:col-span-3">
+                        <label for="senha" class="text-xs font-semibold text-gray-700">Senha: <span class="text-red-500">*</span></label>
+                        <input type="password" id="senha" name="senha" required class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
                     </div>
                 </div>
                 
-                <!-- Seção de Senha Desenho e Checkboxes (agora com radio buttons) -->
+                <!-- Seção de Senha Desenho e Checkboxes -->
                 <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Senha Desenho -->
                     <div class="flex flex-col items-center">
                         <label class="text-xs font-semibold text-gray-700 mb-2">Senha Desenho</label>
-                        <div id="password-circles-container" class="grid grid-cols-3 gap-3 p-3 border-2 border-gray-500 rounded-md bg-gray-50">
-                            <!-- Os círculos serão inseridos aqui pelo JavaScript -->
+                        <div id="password-circles-container" class="grid grid-cols-3 gap-1 p-1 border border-gray-400 rounded-md bg-gray-50" style="width: fit-content;">
+                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
+                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
+                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
+                            </svg>
+                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
+                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
+                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
+                            </svg>
+                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
+                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
+                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
+                            </svg>
+                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
+                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
+                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
+                            </svg>
+                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
+                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
+                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
+                            </svg>
+                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
+                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
+                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
+                            </svg>
+                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
+                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
+                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
+                            </svg>
+                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
+                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
+                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
+                            </svg>
+                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
+                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
+                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
+                            </svg>
                         </div>
                     </div>
 
                     <!-- Informações de Acessórios e Condições -->
                     <div class="flex flex-col space-y-3 justify-center text-xs">
-                        <div class="flex flex-col space-y-2">
-                            <!-- Chip -->
-                            <div class="flex items-center space-x-4">
-                                <label class="text-xs font-semibold text-gray-700">Chip entregue ao cliente?</label>
-                                <div class="flex items-center space-x-2">
-                                    <input type="radio" name="chip_entregue" id="chip-entregue-yes" class="rounded text-lime-500 focus:ring-lime-500">
-                                    <label for="chip-entregue-yes">Sim</label>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <input type="radio" name="chip_entregue" id="chip-entregue-no" class="rounded text-lime-500 focus:ring-lime-500">
-                                    <label for="chip-entregue-no">Não</label>
-                                </div>
+                        <!-- Chip -->
+                        <div class="flex items-center space-x-4">
+                            <label class="text-xs font-semibold text-gray-700">Chip:</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="radio" name="chip" id="chip-entregue" value="entregue" class="rounded text-lime-500 focus:ring-lime-500">
+                                <label for="chip-entregue">Entregue ao cliente</label>
                             </div>
-                            <div class="flex items-center space-x-4">
-                                <label class="text-xs font-semibold text-gray-700">Chip ficou na loja?</label>
-                                <div class="flex items-center space-x-2">
-                                    <input type="radio" name="chip_ficou" id="chip-ficou-yes" class="rounded text-lime-500 focus:ring-lime-500">
-                                    <label for="chip-ficou-yes">Sim</label>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <input type="radio" name="chip_ficou" id="chip-ficou-no" class="rounded text-lime-500 focus:ring-lime-500">
-                                    <label for="chip-ficou-no">Não</label>
-                                </div>
+                            <div class="flex items-center space-x-2">
+                                <input type="radio" name="chip" id="chip-ficou" value="ficou" checked class="rounded text-lime-500 focus:ring-lime-500">
+                                <label for="chip-ficou">Ficou na loja</label>
                             </div>
-                            <!-- Capa -->
-                            <div class="flex items-center space-x-4">
-                                <label class="text-xs font-semibold text-gray-700">Capa entregue ao cliente?</label>
-                                <div class="flex items-center space-x-2">
-                                    <input type="radio" name="capa_entregue" id="capa-entregue-yes" class="rounded text-lime-500 focus:ring-lime-500">
-                                    <label for="capa-entregue-yes">Sim</label>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <input type="radio" name="capa_entregue" id="capa-entregue-no" class="rounded text-lime-500 focus:ring-lime-500">
-                                    <label for="capa-entregue-no">Não</label>
-                                </div>
+                        </div>
+                        <!-- Capa -->
+                        <div class="flex items-center space-x-4">
+                            <label class="text-xs font-semibold text-gray-700">Capa:</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="radio" name="capa" id="capa-entregue" value="entregue" class="rounded text-lime-500 focus:ring-lime-500">
+                                <label for="capa-entregue">Entregue ao cliente</label>
                             </div>
-                            <div class="flex items-center space-x-4">
-                                <label class="text-xs font-semibold text-gray-700">Capa ficou na loja?</label>
-                                <div class="flex items-center space-x-2">
-                                    <input type="radio" name="capa_ficou" id="capa-ficou-yes" class="rounded text-lime-500 focus:ring-lime-500">
-                                    <label for="capa-ficou-yes">Sim</label>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <input type="radio" name="capa_ficou" id="capa-ficou-no" class="rounded text-lime-500 focus:ring-lime-500">
-                                    <label for="capa-ficou-no">Não</label>
-                                </div>
+                            <div class="flex items-center space-x-2">
+                                <input type="radio" name="capa" id="capa-ficou" value="ficou" checked class="rounded text-lime-500 focus:ring-lime-500">
+                                <label for="capa-ficou">Ficou na loja</label>
                             </div>
-                            <!-- Cartão SD adicionado -->
-                             <div class="flex items-center space-x-4">
-                                <label class="text-xs font-semibold text-gray-700">Cartão SD entregue ao cliente?</label>
-                                <div class="flex items-center space-x-2">
-                                    <input type="radio" name="sd-card-entregue" id="sd-card-yes" class="rounded text-lime-500 focus:ring-lime-500">
-                                    <label for="sd-card-yes">Sim</label>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <input type="radio" name="sd-card-entregue" id="sd-card-no" class="rounded text-lime-500 focus:ring-lime-500">
-                                    <label for="sd-card-no">Não</label>
-                                </div>
+                        </div>
+                        <!-- Cartão SD -->
+                        <div class="flex items-center space-x-4">
+                            <label class="text-xs font-semibold text-gray-700">Cartão SD:</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="radio" name="sd_card" id="sd-card-entregue" value="entregue" class="rounded text-lime-500 focus:ring-lime-500">
+                                <label for="sd-card-entregue">Entregue ao cliente</label>
                             </div>
-                            <!-- Líquido e Queda -->
-                            <div class="flex items-center space-x-4">
-                                <label class="text-xs font-semibold text-gray-700">Teve contato com algum líquido?</label>
-                                <div class="flex items-center space-x-2">
-                                    <input type="radio" name="liquid-contact" id="liquid-yes" class="rounded text-lime-500 focus:ring-lime-500">
-                                    <label for="liquid-yes">Sim</label>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <input type="radio" name="liquid-contact" id="liquid-no" class="rounded text-lime-500 focus:ring-lime-500">
-                                    <label for="liquid-no">Não</label>
-                                </div>
+                            <div class="flex items-center space-x-2">
+                                <input type="radio" name="sd_card" id="sd-card-ficou" value="ficou" checked class="rounded text-lime-500 focus:ring-lime-500">
+                                <label for="sd-card-ficou">Ficou na loja</label>
                             </div>
-                            <div class="flex items-center space-x-4">
-                                <label class="text-xs font-semibold text-gray-700">Sofreu alguma queda ou batida?</label>
-                                <div class="flex items-center space-x-2">
-                                    <input type="radio" name="fall-contact" id="fall-yes" class="rounded text-lime-500 focus:ring-lime-500">
-                                    <label for="fall-yes">Sim</label>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <input type="radio" name="fall-contact" id="fall-no" class="rounded text-lime-500 focus:ring-lime-500">
-                                    <label for="fall-no">Não</label>
-                                </div>
+                        </div>
+                        <!-- Líquido e Queda -->
+                        <div class="flex items-center space-x-4">
+                            <label class="text-xs font-semibold text-gray-700">Teve contato com líquido?</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="radio" name="contato_liquido" id="liquid-yes" value="sim" class="rounded text-lime-500 focus:ring-lime-500">
+                                <label for="liquid-yes">Sim</label>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <input type="radio" name="contato_liquido" id="liquid-no" value="nao" checked class="rounded text-lime-500 focus:ring-lime-500">
+                                <label for="liquid-no">Não</label>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <label class="text-xs font-semibold text-gray-700">Sofreu queda ou batida?</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="radio" name="queda_batida" id="fall-yes" value="sim" class="rounded text-lime-500 focus:ring-lime-500">
+                                <label for="fall-yes">Sim</label>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <input type="radio" name="queda_batida" id="fall-no" value="nao" checked class="rounded text-lime-500 focus:ring-lime-500">
+                                <label for="fall-no">Não</label>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Campo para Observações sobre a Condição Física -->
-        <div class="mt-6 border-t-2 border-lime-500 pt-4">
-            <div class="bg-gray-200 p-2 rounded-t-lg">
-                <h3 class="text-xs font-bold text-gray-900">OBSERVAÇÕES SOBRE A CONDIÇÃO FÍSICA DO APARELHO NO RECEBIMENTO</h3>
+        </div>
+
+        <!-- 1. OBSERVAÇÕES -->
+        <div class="mt-4 page-break-section" style="border-top: 2px solid #84cc16;">
+            <div class="bg-gray-200 p-2">
+                <span style="font-size: 10px; font-weight: bold; color: #111;">OBSERVAÇÕES SOBRE A CONDIÇÃO FÍSICA DO APARELHO NO RECEBIMENTO</span>
             </div>
-            <div class="p-4 border-2 border-gray-300 rounded-b-lg">
-                <textarea rows="4" class="w-full p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-lime-500"></textarea>
+            <div class="p-4 border-2 border-gray-300">
+                <textarea id="observacoes" name="observacoes" rows="3" style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
             </div>
         </div>
-        
-        <!-- Novo campo para Problema Relatado pelo Cliente -->
-        <div class="mt-6 border-t-2 border-lime-500 pt-4">
-            <div class="bg-gray-200 p-2 rounded-t-lg">
-                <h3 class="text-xs font-bold text-gray-900">PROBLEMA RELATADO PELO CLIENTE</h3>
+
+        <!-- 2. PROBLEMA -->
+        <div class="mt-4" style="border-top: 2px solid #84cc16;">
+            <div class="bg-gray-200 p-2">
+                <span style="font-size: 10px; font-weight: bold; color: #111;">PROBLEMA RELATADO PELO CLIENTE</span>
             </div>
-            <div class="p-4 border-2 border-gray-300 rounded-b-lg">
-                <textarea rows="4" class="w-full p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-lime-500"></textarea>
+            <div class="p-4 border-2 border-gray-300">
+                <textarea id="problema" name="problema" required rows="3" style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
             </div>
         </div>
-        
-        <!-- Novo campo para Aprovação do Orçamento e Prazo de Retirada -->
-        <div class="mt-6 border-t-2 border-lime-500 pt-4">
-            <div class="bg-gray-200 p-2 rounded-t-lg">
-                <h3 class="text-xs font-bold text-gray-900">APROVAÇÃO DO ORÇAMENTO E PRAZO DE RETIRADA</h3>
+
+        <!-- 3. APROVAÇÃO -->
+        <div class="mt-4" style="border-top: 2px solid #84cc16;">
+            <div class="bg-gray-200 p-2">
+                <span style="font-size: 10px; font-weight: bold; color: #111;">APROVAÇÃO DO ORÇAMENTO E PRAZO DE RETIRADA</span>
             </div>
-            <div class="p-4 border-2 border-gray-300 rounded-b-lg">
-                <p class="mb-3 text-xs">
-                    O valor do serviço será informado ao cliente conforme o número de celular ou email fornecido nesta ordem de serviço. O orçamento não se aplica a reparos cobertos pela garantia do fabricante, pois não geram custos. <span class="font-bold italic">O prazo legal para a conclusão do serviço é de 30 dias, independentemente de o reparo ser ou não coberto pela garantia, conforme o Código de Defesa do Consumidor.</span> Se não houver aprovação ou retorno do cliente em 7 dias, o serviço será cancelado e o aparelho ficará disponível para retirada.
-                </p>
-                <div class="flex flex-col md:flex-row md:justify-between items-start md:items-center mt-3 text-xs font-semibold text-gray-700">
-                    <div class="flex items-center space-x-1 mb-2 md:mb-0">
-                        <span>DATA DE ENTRADA (</span>
-                        <input type="text" class="w-24 p-1 border border-gray-300 rounded-md text-center">
-                        <span>)</span>
-                    </div>
-                    <div class="flex items-center space-x-1">
-                        <span>DATA DE SAÍDA (</span>
-                        <input type="text" class="w-24 p-1 border border-gray-300 rounded-md text-center">
-                        <span>)</span>
-                    </div>
+            <div class="p-4 border-2 border-gray-300">
+                <p style="font-size: 10px; margin-bottom: 8px;">O valor do serviço será informado ao cliente conforme o número de celular ou email fornecido nesta ordem de serviço. O orçamento não se aplica a reparos cobertos pela garantia do fabricante, pois não geram custos. O prazo legal para a conclusão do serviço é de 30 dias, independentemente de o reparo ser ou não coberto pela garantia, conforme o Código de Defesa do Consumidor. Se não houver aprovação ou retorno do cliente em 7 dias, o serviço será cancelado e o aparato ficará disponível para retirada.</p>
+                <div style="font-size: 10px; font-weight: bold; margin-bottom: 5px; display: flex; gap: 10px;">
+                    <div style="width: 50%;">DATA DE ENTRADA <input type="text" id="data-entrada" name="data_entrada" required placeholder="dd/mm/aaaa" maxlength="10" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px; width: 100%;"></div>
+                    <div style="width: 50%;">DATA DE SAÍDA <input type="text" id="data-saida" name="data_saida" placeholder="    " maxlength="10" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px; width: 100%;"></div>
                 </div>
-                 <!-- Campo para Responsável pela Retirada -->
-                 <div class="flex flex-col mt-4 w-full items-end">
-                    <label class="text-xs font-semibold text-gray-700">RESPONSÁVEL PELA RETIRADA DO APARELHO:</label>
-                    <div class="mt-2 border-b-2 border-gray-400 h-8 w-1/2"></div>
+                <div style="margin-top: 5px;">
+                    <label style="font-size: 10px; font-weight: bold;">RESPONSÁVEL PELA RETIRADA DO APARELHO:</label>
+                    <input type="text" id="responsavel-retirada" name="responsavel_retirada" style="margin-top: 3px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; width: 100%;">
                 </div>
             </div>
         </div>
-        
-        <!-- Novo campo para Assinatura e Concordância -->
-        <div class="mt-6 border-t-2 border-lime-500 pt-4">
-            <div class="bg-gray-200 p-2 rounded-t-lg">
-                <h3 class="text-sm font-bold text-gray-900">ASSINATURA E CONCORDÂNCIA</h3>
+
+        <!-- 4. ASSINATURA -->
+        <div class="mt-4" style="border-top: 2px solid #84cc16;">
+            <div class="bg-gray-200 p-2">
+                <span style="font-size: 10px; font-weight: bold; color: #111;">ASSINATURA E CONCORDÂNCIA</span>
             </div>
-            <div class="p-4 border-2 border-gray-300 rounded-b-lg">
-                <div class="flex justify-between items-center mt-3 text-xs font-semibold text-gray-700">
-                    <div class="flex-1 pr-2">
-                        <span>ASSINATURA DO CLIENTE:</span>
-                        <div class="mt-2 border-b-2 border-gray-400 h-8"></div>
-                    </div>
-                    <div class="flex-1 pl-2 border-l border-gray-400">
-                        <span>NOME E ASSINATURA DO GERENTE RESPONSÁVEL:</span>
-                        <div class="mt-2 border-b-2 border-gray-400 h-8"></div>
-                    </div>
+            <div class="p-4 border-2 border-gray-300">
+                <div style="font-size: 10px; font-weight: bold;">
+                    <div style="margin-bottom: 8px;">ASSINATURA DO CLIENTE:<div style="border-bottom: 2px solid #666; height: 40px;"></div></div>
+                    <div>NOME E ASSINATURA DO GERENTE RESPONSÁVEL:<div style="border-bottom: 2px solid #666; height: 40px;"></div></div>
                 </div>
             </div>
         </div>
-        
-        <!-- Novo campo com texto em letras pequenas -->
-        <div class="mt-3 text-[0.6rem] text-gray-500">
-            <p>
-                Este termo de serviço é válido para todas as unidades da rede Miplace, que operam sob suas respectivas razões sociais e CNPJs. As unidades são: a da Rua Quinze de Novembro, 910, operada por Fernandes Comércio de Celulares e Importação LTDA (CNPJ: 13.787.408/0001-05); a da Rua Dom Pedro II, 857, operada por Jackcell Celulares e Importados LTDA (CNPJ: 34.511.185/0001-10); a da Rua Benjamin Constant, 1230, operada por Filipe Almeida Gil de Souza LTDA (CNPJ: 44.739.622/0001-01); a da Rua Treze de Maio, 218, Loja 09, operada por Mi Place Amparo LTDA (CNPJ: 58.495.100/0001-16); e a da Rua Treze de Maio, 26, operada por J. de A. Fernandes Operações de Crédito (CNPJ: 58.186.781/0001-30).
-            </p>
+
+        <!-- 5. TEXTO UNIDADES -->
+        <div class="mt-4 p-4" style="border-top: 2px solid #84cc16; border: 2px solid #ccc; font-size: 10px; color: #666;">
+            <p>Este termo de serviço é válido para todas as unidades da rede Miplace, que operam sob suas respectivas razões sociais e CNPJs. As unidades são: a da Rua Quinze de Novembro, 910, operada por Fernandes Comércio de Celulares e Importação LTDA (CNPJ: 13.787.408/0001-05); a da Rua Dom Pedro II, 857, operada por Jackcell Celulares e Importados LTDA (CNPJ: 34.511.185/0001-10); a da Rua Benjamin Constant, 1230, operada por Filipe Almeida Gil de Souza LTDA (CNPJ: 44.739.622/0001-01); a da Rua Treze de Maio, 218, Loja 09, operada por Mi Place Amparo LTDA (CNPJ: 58.495.100/0001-16); e a da Rua Treze de Maio, 26, operada por J. de A. Fernandes Operações de Crédito (CNPJ: 58.186.781/0001-30).</p>
         </div>
+        </form>
         
-        <!-- Botão de Download -->
-        <div class="download-button flex justify-center mt-6">
-            <button onclick="window.print()" class="bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
-                Download / Imprimir
+        <!-- Botões de Ação -->
+        <div class="download-button flex justify-center gap-4 mt-6">
+            <button onclick="imprimirOS()" class="bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                Imprimir
             </button>
+            <button onclick="downloadPDF()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                Download PDF
+            </button>
+            <button onclick="limparFormulario()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                Limpar
+            </button>
+        </div>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const container = document.getElementById('password-circles-container');
-            if (container) {
-                // Remove a implementação antiga
-                container.innerHTML = '';
-                
-                // Cria as novas bolinhas com a cruz dentro, usando SVG
-                for (let i = 0; i < 9; i++) {
-                    const circle = document.createElement('div');
-                    circle.className = 'relative w-10 h-10 rounded-full border-2 border-gray-600 flex items-center justify-center';
-                    
-                    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                    svg.setAttribute('width', '25');
-                    svg.setAttribute('height', '25');
-                    svg.setAttribute('viewBox', '0 0 25 25');
-                    svg.classList.add('absolute', 'w-full', 'h-full');
-                    
-                    const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    line1.setAttribute('x1', '0');
-                    line1.setAttribute('y1', '12.5');
-                    line1.setAttribute('x2', '25');
-                    line1.setAttribute('y2', '12.5');
-                    line1.setAttribute('stroke', '#000000');
-                    line1.setAttribute('stroke-width', '2');
-                    
-                    const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    line2.setAttribute('x1', '12.5');
-                    line2.setAttribute('y1', '0');
-                    line2.setAttribute('x2', '12.5');
-                    line2.setAttribute('y2', '25');
-                    line2.setAttribute('stroke', '#000000');
-                    line2.setAttribute('stroke-width', '2');
+    <!-- Modal pós-impressão -->
+    <div id="post-print-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 11 12 14 22 4"></polyline>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                </svg>
+            </div>
+            <h3 class="modal-title">Impressão concluída!</h3>
+            <p class="modal-description">O que deseja fazer agora?</p>
+            <div class="modal-actions">
+                <button onclick="reimprimirOS()" class="modal-btn modal-btn-primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    Reimprimir
+                </button>
+                <button onclick="novaOSPosImpressao()" class="modal-btn modal-btn-secondary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Nova O.S.
+                </button>
+            </div>
+        </div>
+    </div>
 
-                    svg.appendChild(line1);
-                    svg.appendChild(line2);
-                    
-                    circle.appendChild(svg);
-                    
-                    container.appendChild(circle);
-                }
-            }
-        });
-    </script>
+    <script src="script.js" defer></script>
 </body>
 </html>
