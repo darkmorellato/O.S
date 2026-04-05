@@ -1,0 +1,368 @@
+/* Estilos CSS personalizados para uma visualização responsiva em tela */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f4f8;
+    min-height: 100vh;
+}
+
+/* Tela de Boas-Vindas */
+.welcome-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #3b82f6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.welcome-screen.hidden {
+    opacity: 0;
+    transform: scale(1.05);
+    pointer-events: none;
+}
+
+.welcome-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    padding: 48px 40px;
+    text-align: center;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    animation: fadeInUp 0.8s ease;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.welcome-icon {
+    width: 96px;
+    height: 96px;
+    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+}
+
+.welcome-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 4px;
+    letter-spacing: -0.5px;
+}
+
+.welcome-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 0 20px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.welcome-divider {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #60a5fa, #93c5fd);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+}
+
+.welcome-description {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 32px;
+    line-height: 1.6;
+}
+
+.welcome-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    color: #1e40af;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px 32px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    letter-spacing: 0.3px;
+}
+
+.welcome-btn:hover {
+    background: #eff6ff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-btn:active {
+    transform: translateY(0);
+}
+
+/* Modal pós-impressão */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 40px 36px;
+    text-align: center;
+    max-width: 380px;
+    width: 90%;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.4s ease;
+}
+
+@keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-icon {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, #dbeafe, #eff6ff);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 8px;
+}
+
+.modal-description {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #64748b;
+    margin: 0 0 28px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.modal-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 8px;
+}
+
+.modal-btn-primary {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.modal-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+.modal-btn-secondary {
+    background: #f1f5f9;
+    color: #334155;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.modal-btn-secondary:hover {
+    background: #e2e8f0;
+    transform: translateY(-1px);
+}
+
+#os-wrapper {
+    width: 55vw;
+    margin: 0 auto;
+}
+
+#os-content {
+    width: 100%;
+    margin: 0 auto;
+    padding: 10mm;
+    box-sizing: border-box;
+}
+
+/* Estilos de impressão para o formato A4 */
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 0;
+    }
+    
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    html, body {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+    }
+    
+    #os-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    #os-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 8mm 10mm !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+    }
+    
+    .download-button { display: none !important; }
+    .welcome-screen { display: none !important; }
+    #post-print-modal { display: none !important; }
+    
+    header { margin-bottom: 3mm !important; padding-bottom: 2mm !important; }
+    
+    h1 { font-size: 14pt !important; }
+    h2 { font-size: 9pt !important; margin-bottom: 2mm !important; }
+    h3 { font-size: 8.5pt !important; margin-bottom: 1mm !important; }
+    p, li, label, div, span, input, textarea { font-size: 8pt !important; }
+    
+    main p { line-height: 1.25 !important; margin-bottom: 1.5mm !important; }
+    
+    .dados-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 3mm !important;
+        margin-top: 2mm !important;
+    }
+    
+    .dados-cliente, .dados-aparelho {
+        width: 100% !important;
+    }
+    
+    .dados-aparelho .mt-4 { margin-top: 0 !important; }
+    
+    .grid { gap: 1.5mm !important; }
+    .flex { gap: 1.5mm !important; }
+    
+    .p-8 { padding: 2mm !important; }
+    .p-4, .p-3 { padding: 2mm !important; }
+    .p-2 { padding: 1mm !important; }
+    
+    .mb-1, .mb-3, .mb-4 { margin-bottom: 1mm !important; }
+    .mt-1, .mt-2, .mt-3, .mt-4, .mt-6 { margin-top: 1.5mm !important; }
+    
+    main + form, main form { margin-top: 1mm !important; }
+    
+    ul { margin: 0 !important; padding-left: 3mm !important; }
+    li { margin: 0 !important; line-height: 1.25 !important; }
+    
+    .border-2 { border-width: 0.5pt !important; }
+    .border-t-2 { border-top-width: 0.5pt !important; }
+    .border-b-2 { border-bottom-width: 0.5pt !important; }
+    
+    .bg-gray-200 { background-color: #e5e7eb !important; }
+    .rounded-t-lg, .rounded-b-lg { border-radius: 0 !important; }
+    
+    input[type="text"], input[type="email"], input[type="tel"],
+    input[type="password"], input[type="date"], textarea, select {
+        background-color: transparent !important;
+        border: none !important;
+        border-bottom: 0.5px solid #999 !important;
+        font-size: 8pt !important;
+        padding: 0.5mm !important;
+    }
+    
+    input[type="radio"] {
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        width: 8px !important;
+        height: 8px !important;
+        border: 1.5px solid #333 !important;
+        border-radius: 50% !important;
+        display: inline-block !important;
+        vertical-align: middle !important;
+        margin-right: 2mm !important;
+        position: relative !important;
+        background: transparent !important;
+    }
+    
+    input[type="radio"]:checked {
+        background-color: #333 !important;
+        background-image: radial-gradient(circle, #fff 2px, transparent 2px) !important;
+    }
+    
+    img { max-width: 12mm !important; height: auto !important; }
+    
+    textarea {
+        min-height: 10mm !important;
+        max-height: 10mm !important;
+    }
+    
+    #password-circles-container svg {
+        width: 18px !important;
+        height: 18px !important;
+    }
+    
+    .mt-4 { margin-top: 2mm !important; }
+    
+    .border-lime-500 { border-color: #84cc16 !important; }
+    
+    .page-break-section { page-break-before: always !important; }
+}

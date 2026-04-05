@@ -8,14 +8,24 @@
     <meta name="author" content="MiPlace">
     <meta name="robots" content="noindex, nofollow">
     <title>Ordem de Serviço MiPlace</title>
+
+    <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+
+    <!-- Custom Stylesheets (load after Tailwind for overrides) -->
+    <link rel="stylesheet" href="src/css/base.css">
+    <link rel="stylesheet" href="src/css/layout.css">
+    <link rel="stylesheet" href="src/css/components.css">
+    <link rel="stylesheet" href="src/css/print.css" media="print">
 </head>
 <body class="bg-gray-100">
 
-    <!-- Tela de Boas-Vindas -->
+    <!-- Skip Link for Accessibility -->
+    <a href="#os-content" class="skip-link">Pular para o conteúdo principal</a>
+
+    <!-- Welcome Screen -->
     <div id="welcome-screen" class="welcome-screen">
         <div class="welcome-card">
             <div class="welcome-icon">
@@ -29,7 +39,7 @@
             <p class="welcome-subtitle">Sistema de Ordem de Serviço</p>
             <div class="welcome-divider"></div>
             <p class="welcome-description">Gerencie seus atendimentos de forma rápida e profissional.</p>
-            <button onclick="iniciarNovaOS()" class="welcome-btn">
+            <button type="button" onclick="UIController.hideWelcome()" class="welcome-btn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -40,356 +50,327 @@
     </div>
 
     <div id="os-wrapper">
-        <!-- Container principal com a Ordem de Serviço -->
-        <div id="os-content" class="bg-white rounded-xl p-8 shadow-xl" style="display: none;">
+        <!-- Main OS Content -->
+        <div id="os-content" class="bg-white rounded-xl shadow-xl hidden">
 
-        <!-- Seção do Cabeçalho com o logo e o título -->
-        <header class="flex items-center justify-between border-b-2 border-lime-500 pb-2 mb-4">
-            <div class="flex items-center">
-                <!-- Logo da Mi Place -->
-                <img src="https://placehold.co/80x80/0d6efd/ffffff?text=MI+PLACE" alt="Logo MiPlace" class="h-12 w-12 mr-2 rounded-lg">
-                
-                <!-- Título principal -->
-                <h1 class="text-2xl font-extrabold text-gray-900">ORDEM DE SERVIÇO MI PLACE</h1>
-            </div>
-            <div class="text-right">
-                <div class="text-xs text-gray-600">Nº OS</div>
-                <div id="os-number" class="text-lg font-bold text-lime-600">000001</div>
-            </div>
-        </header>
+            <!-- Header -->
+            <header class="os-header">
+                <div class="os-header__brand">
+                    <img src="https://placehold.co/80x80/0d6efd/ffffff?text=MI+PLACE" alt="Logo MiPlace" class="os-header__logo">
+                    <h1 class="os-header__title">ORDEM DE SERVIÇO</h1>
+                </div>
+                <div class="os-header__number-box">
+                    <p class="os-header__number-label">Número</p>
+                    <p id="os-number" class="os-header__number-value">000001</p>
+                </div>
+            </header>
 
-        <!-- Seção do conteúdo principal -->
-        <main class="text-gray-700 text-sm">
-            <!-- Alerta de salvamento automático -->
-            <div id="autosave-notification" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4 text-xs">
+            <!-- Auto-save Notification -->
+            <div id="autosave-notification" class="notification hidden">
                 Dados salvos automaticamente!
             </div>
-            
-            <!-- Título da seção de termos e condições -->
-            <h2 class="text-xs font-semibold mb-3 text-gray-800">TERMOS E CONDIÇÕES DE PRESTAÇÃO DE SERVIÇOS</h2>
-            
-            <!-- Item 1: Da Garantia de Nossos Serviços -->
-            <h3 class="font-bold text-gray-800 mb-1">1. Da Garantia de Nossos Serviços (Garantia Legal)</h3>
-            <p class="mb-3">
-                Em conformidade com o Código de Defesa do Consumidor (Lei nº 8.078/90, Art. 26, Inciso II), a garantia legal para os serviços de reparo prestados e para as peças substituídas pela nossa assistência técnica é de 90 (noventa) dias. Esta garantia se aplica exclusivamente a vícios ou falhas diretamente relacionados ao serviço que executamos.
-            </p>
 
-            <!-- Item 2: Da Responsabilidade em Reparos de Garantia de Fábrica -->
-            <h3 class="font-bold text-gray-800 mb-1">2. Da Responsabilidade em Reparos de Garantia de Fábrica</h3>
-            <p class="mb-3">
-                Em casos de envio do equipamento para a garantia do fabricante, nossa empresa atua estritamente como intermediária logística, sem qualquer responsabilidade técnica ou comercial sobre o reparo. A total e exclusiva responsabilidade pelo diagnóstico, prazo de conclusão, qualidade do serviço e fornecimento de peças é do fabricante. Nossa loja se isenta expressamente de qualquer vício, dano, extravio ou atraso que possa ocorrer durante o transporte ou no processo de reparo conduzido pelo fabricante.
-            </p>
+            <!-- Terms & Conditions -->
+            <section class="terms-section">
+                <h2 class="terms-section__title">TERMOS E CONDIÇÕES DE PRESTAÇÃO DE SERVIÇOS</h2>
 
-            <!-- Item 3: Condições que Anulam a Garantia -->
-            <h3 class="font-bold text-gray-800 mb-1">3. Condições que Anulam a Garantia</h3>
-            <p class="mb-3">
-                Qualquer garantia (seja a nossa, de serviço, ou a do fabricante, de produto) será imediatamente invalidada se o equipamento apresentar evidências de:
-            </p>
-            <ul class="list-disc list-inside ml-4 mt-2 mb-3">
-                <li>Mau uso (quedas, impactos, sobrecarga).</li>
-                <li>Exposição a líquidos, umidade ou variação de energia.</li>
-                <li>Modificação de software, aplicativos não oficiais, intervenção técnica por terceiros, que não a nossa assistência.</li>
-            </ul>
+                <div class="terms-section__content">
+                    <h3>1. Da Garantia de Nossos Serviços (Garantia Legal)</h3>
+                    <p>Em conformidade com o Código de Defesa do Consumidor (Lei nº 8.078/90, Art. 26, Inciso II), a garantia legal para os serviços de reparo prestados e para as peças substituídas pela nossa assistência técnica é de 90 (noventa) dias. Esta garantia se aplica exclusivamente a vícios ou falhas diretamente relacionados ao serviço que executamos.</p>
 
-            <!-- Espaço adicionado aqui -->
-            <br>
+                    <h3>2. Da Responsabilidade em Reparos de Garantia de Fábrica</h3>
+                    <p>Em casos de envio do equipamento para a garantia do fabricante, nossa empresa atua estritamente como intermediária logística, sem qualquer responsabilidade técnica ou comercial sobre o reparo. A total e exclusiva responsabilidade pelo diagnóstico, prazo de conclusão, qualidade do serviço e fornecimento de peças é do fabricante. Nossa loja se isenta expressamente de qualquer vício, dano, extravio ou atraso que possa ocorrer durante o transporte ou no processo de reparo conduzido pelo fabricante.</p>
 
-            <!-- Item 4: Do Laudo Técnico -->
-            <h3 class="font-bold text-gray-800 mb-1 mt-2">4. Do Laudo Técnico</h3>
-            <p class="mb-3">
-                O laudo emitido pelo técnico responsável, descrevendo o diagnóstico, o problema e a causa da falha, é o documento oficial que fundamenta a recusa ou a validade da garantia. Este parecer técnico é soberano para a avaliação das condições do aparelho e das causas que invalidam a cobertura da garantia.
-            </p>
+                    <h3>3. Condições que Anulam a Garantia</h3>
+                    <p>Qualquer garantia (seja a nossa, de serviço, ou a do fabricante, de produto) será imediatamente invalidada se o equipamento apresentar evidências de:</p>
+                    <ul>
+                        <li>Mau uso (quedas, impactos, sobrecarga).</li>
+                        <li>Exposição a líquidos, umidade ou variação de energia.</li>
+                        <li>Modificação de software, aplicativos não oficiais, intervenção técnica por terceiros, que não a nossa assistência.</li>
+                    </ul>
 
-            <!-- Item 5: Da Responsabilidade por Dados e Acessórios -->
-            <h3 class="font-bold text-gray-800 mb-1">5. Da Responsabilidade por Dados e Acessórios</h3>
-            <p class="mb-3">
-                O cliente assume a total responsabilidade pelo backup de dados, arquivos e configurações. Nossa assistência não se responsabiliza por qualquer perda de informação. Para um diagnóstico e teste completos, solicitamos a senha de acesso do aparelho. Caso o cliente opte por não fornecê-la, ele está ciente de que não poderá alegar que uma função específica, que depende de acesso ao sistema, não foi reparada ou está com mau funcionamento, uma vez que não foi possível testá-la.
-            </p>
-        </main>
-        
-        <!-- Seção de Dados do Cliente e do Aparelho -->
-        <form id="os-form" class="border-t-2 border-lime-500 pt-2">
-            <div class="dados-grid">
-            <!-- Dados do Cliente -->
-            <div class="dados-cliente">
-            <div class="bg-gray-200 p-2 rounded-t-lg">
-                <h3 class="text-xs font-bold text-gray-900">DADOS DO CLIENTE</h3>
-            </div>
-            <div class="p-4 border-2 border-gray-300 rounded-b-lg">
-                <!-- Linha 1: Nome e CPF/CNPJ -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                    <div class="flex flex-col">
-                        <label for="nome-cliente" class="text-xs font-semibold text-gray-700">Nome completo ou Razão Social: <span class="text-red-500">*</span></label>
-                        <input type="text" id="nome-cliente" name="nome" required class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="cpf-cnpj" class="text-xs font-semibold text-gray-700">CPF ou CNPJ: <span class="text-red-500">*</span></label>
-                        <input type="text" id="cpf-cnpj" name="cpf_cnpj" required class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500" placeholder="000.000.000-00 ou 00.000.000/0001-00">
-                    </div>
+                    <h3>4. Do Laudo Técnico</h3>
+                    <p>O laudo emitido pelo técnico responsável, descrevendo o diagnóstico, o problema e a causa da falha, é o documento oficial que fundamenta a recusa ou a validade da garantia. Este parecer técnico é soberano para a avaliação das condições do aparelho e das causas que invalidam a cobertura da garantia.</p>
+
+                    <h3>5. Da Responsabilidade por Dados e Acessórios</h3>
+                    <p>O cliente assume a total responsabilidade pelo backup de dados, arquivos e configurações. Nossa assistência não se responsabiliza por qualquer perda de informação. Para um diagnóstico e teste completos, solicitamos a senha de acesso do aparelho. Caso o cliente opte por não fornecê-la, ele está ciente de que não poderá alegar que uma função específica, que depende de acesso ao sistema, não foi reparada ou está com mau funcionamento, uma vez que não foi possível testá-la.</p>
                 </div>
-                <!-- Linha 2: CEP, Cidade, Estado -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-                    <div class="flex flex-col">
-                        <label for="cep" class="text-xs font-semibold text-gray-700">CEP: <span class="text-red-500">*</span></label>
-                        <input type="text" id="cep" name="cep" required class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500" placeholder="00000-000">
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="cidade" class="text-xs font-semibold text-gray-700">Cidade:</label>
-                        <input type="text" id="cidade" name="cidade" class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="estado" class="text-xs font-semibold text-gray-700">Estado:</label>
-                        <input type="text" id="estado" name="estado" class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500" placeholder="SP">
-                    </div>
-                </div>
-                <!-- Linha 3: Endereço, Número, Complemento -->
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 mb-3">
-                    <div class="flex flex-col md:col-span-7">
-                        <label for="endereco" class="text-xs font-semibold text-gray-700">Endereço:</label>
-                        <input type="text" id="endereco" name="endereco" class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
-                    </div>
-                    <div class="flex flex-col md:col-span-2">
-                        <label for="numero" class="text-xs font-semibold text-gray-700">Número: <span class="text-red-500">*</span></label>
-                        <input type="text" id="numero" name="numero" required class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
-                    </div>
-                    <div class="flex flex-col md:col-span-3">
-                        <label for="complemento" class="text-xs font-semibold text-gray-700">Complemento:</label>
-                        <input type="text" id="complemento" name="complemento" class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
-                    </div>
-                </div>
-                <!-- Linha 4: Telefone e Email -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div class="flex flex-col">
-                        <label for="telefone" class="text-xs font-semibold text-gray-700">Telefone: <span class="text-red-500">*</span></label>
-                        <input type="tel" id="telefone" name="telefone" required class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500" placeholder="(00)00000-0000" maxlength="15">
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="email" class="text-xs font-semibold text-gray-700">Email:</label>
-                        <input type="email" id="email" name="email" class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500" placeholder="email@exemplo.com">
-                    </div>
-                </div>
-            </div>
-            </div>
+            </section>
 
-            <!-- Dados do Aparelho -->
-            <div class="dados-aparelho">
-            <div class="bg-gray-200 p-2 rounded-t-lg mt-4">
-                <h3 class="text-xs font-bold text-gray-900">DADOS DO APARELHO</h3>
-            </div>
-            <div class="p-4 border-2 border-gray-300 rounded-b-lg">
-                <!-- Linha 1: Marca, Modelo, Cor, IMEI -->
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 mb-3">
-                    <div class="flex flex-col md:col-span-2">
-                        <label for="marca" class="text-xs font-semibold text-gray-700">Marca: <span class="text-red-500">*</span></label>
-                        <input type="text" id="marca" name="marca" required class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
-                    </div>
-                    <div class="flex flex-col md:col-span-4">
-                        <label for="modelo" class="text-xs font-semibold text-gray-700">Modelo: <span class="text-red-500">*</span></label>
-                        <input type="text" id="modelo" name="modelo" required class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
-                    </div>
-                    <div class="flex flex-col md:col-span-2">
-                        <label for="cor" class="text-xs font-semibold text-gray-700">Cor:</label>
-                        <input type="text" id="cor" name="cor" class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
-                    </div>
-                    <div class="flex flex-col md:col-span-4">
-                        <label for="imei" class="text-xs font-semibold text-gray-700">IMEI:</label>
-                        <input type="text" id="imei" name="imei" class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500" maxlength="15">
-                    </div>
-                </div>
-                <!-- Linha 2: Senha -->
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-                    <div class="flex flex-col md:col-span-3">
-                        <label for="senha" class="text-xs font-semibold text-gray-700">Senha: <span class="text-red-500">*</span></label>
-                        <input type="password" id="senha" name="senha" required class="mt-1 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
-                    </div>
-                </div>
-                
-                <!-- Seção de Senha Desenho e Checkboxes -->
-                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Senha Desenho -->
-                    <div class="flex flex-col items-center">
-                        <label class="text-xs font-semibold text-gray-700 mb-2">Senha Desenho</label>
-                        <div id="password-circles-container" class="grid grid-cols-3 gap-1 p-1 border border-gray-400 rounded-md bg-gray-50" style="width: fit-content;">
-                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
-                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
-                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
-                            </svg>
-                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
-                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
-                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
-                            </svg>
-                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
-                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
-                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
-                            </svg>
-                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
-                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
-                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
-                            </svg>
-                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
-                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
-                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
-                            </svg>
-                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
-                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
-                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
-                            </svg>
-                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
-                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
-                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
-                            </svg>
-                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
-                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
-                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
-                            </svg>
-                            <svg width="45" height="45" viewBox="0 0 45 45" style="border:2px solid #000;border-radius:50%;display:flex;margin:3px;">
-                                <line x1="0" y1="22.5" x2="45" y2="22.5" stroke="#000" stroke-width="2"/>
-                                <line x1="22.5" y1="0" x2="22.5" y2="45" stroke="#000" stroke-width="2"/>
-                            </svg>
-                        </div>
-                    </div>
+            <!-- Form -->
+            <form id="os-form" class="os-form" onsubmit="return false;">
 
-                    <!-- Informações de Acessórios e Condições -->
-                    <div class="flex flex-col space-y-3 justify-center text-xs">
-                        <!-- Chip -->
-                        <div class="flex items-center space-x-4">
-                            <label class="text-xs font-semibold text-gray-700">Chip:</label>
-                            <div class="flex items-center space-x-2">
-                                <input type="radio" name="chip" id="chip-entregue" value="entregue" class="rounded text-lime-500 focus:ring-lime-500">
-                                <label for="chip-entregue">Entregue ao cliente</label>
+                <!-- Client Data Section -->
+                <div class="os-form__section">
+                    <div class="os-form__section-header">
+                        <h3 class="os-form__section-title">DADOS DO CLIENTE</h3>
+                    </div>
+                    <div class="os-form__section-content">
+                        <div class="dados-grid">
+                            <!-- Linha 1: Nome (50%) + CPF/CNPJ (50%) -->
+                            <div class="form-field md:col-span-6">
+                                <label for="nome-cliente" class="form-field__label">Nome completo ou Razão Social: <span class="required">*</span></label>
+                                <input type="text" id="nome-cliente" name="nome" required class="form-field__input" placeholder="Digite o nome completo ou razão social">
                             </div>
-                            <div class="flex items-center space-x-2">
-                                <input type="radio" name="chip" id="chip-ficou" value="ficou" checked class="rounded text-lime-500 focus:ring-lime-500">
-                                <label for="chip-ficou">Ficou na loja</label>
+                            <div class="form-field md:col-span-6">
+                                <label for="cpf-cnpj" class="form-field__label">CPF ou CNPJ: <span class="required">*</span></label>
+                                <input type="text" id="cpf-cnpj" name="cpf_cnpj" required class="form-field__input" placeholder="000.000.000-00 ou 00.000.000/0001-00" maxlength="18">
                             </div>
-                        </div>
-                        <!-- Capa -->
-                        <div class="flex items-center space-x-4">
-                            <label class="text-xs font-semibold text-gray-700">Capa:</label>
-                            <div class="flex items-center space-x-2">
-                                <input type="radio" name="capa" id="capa-entregue" value="entregue" class="rounded text-lime-500 focus:ring-lime-500">
-                                <label for="capa-entregue">Entregue ao cliente</label>
+
+                            <!-- Linha 2: CEP (20%) + Cidade (20%) + Estado (10%) + Telefone (25%) + Email (25%) -->
+                            <!-- Total: 2+3+1+3+3 = 12 colunas (100%) -->
+                            <!-- 2/12 ≈ 16.7% (próximo de 20%)
+                                 3/12 = 25% (Cidade um pouco maior para compensar)
+                                 1/12 ≈ 8.3% (Estado)
+                                 3/12 = 25% (Telefone)
+                                 3/12 = 25% (Email) -->
+                            <div class="form-field md:col-span-2">
+                                <label for="cep" class="form-field__label">CEP: <span class="required">*</span></label>
+                                <input type="text" id="cep" name="cep" required class="form-field__input" placeholder="00000-000" maxlength="9">
                             </div>
-                            <div class="flex items-center space-x-2">
-                                <input type="radio" name="capa" id="capa-ficou" value="ficou" checked class="rounded text-lime-500 focus:ring-lime-500">
-                                <label for="capa-ficou">Ficou na loja</label>
+                            <div class="form-field md:col-span-3">
+                                <label for="cidade" class="form-field__label">Cidade:</label>
+                                <input type="text" id="cidade" name="cidade" class="form-field__input" placeholder="Cidade">
                             </div>
-                        </div>
-                        <!-- Cartão SD -->
-                        <div class="flex items-center space-x-4">
-                            <label class="text-xs font-semibold text-gray-700">Cartão SD:</label>
-                            <div class="flex items-center space-x-2">
-                                <input type="radio" name="sd_card" id="sd-card-entregue" value="entregue" class="rounded text-lime-500 focus:ring-lime-500">
-                                <label for="sd-card-entregue">Entregue ao cliente</label>
+                            <div class="form-field md:col-span-1">
+                                <label for="estado" class="form-field__label">UF:</label>
+                                <input type="text" id="estado" name="estado" class="form-field__input" placeholder="SP" maxlength="2">
                             </div>
-                            <div class="flex items-center space-x-2">
-                                <input type="radio" name="sd_card" id="sd-card-ficou" value="ficou" checked class="rounded text-lime-500 focus:ring-lime-500">
-                                <label for="sd-card-ficou">Ficou na loja</label>
+                            <div class="form-field md:col-span-3">
+                                <label for="telefone" class="form-field__label">Telefone: <span class="required">*</span></label>
+                                <input type="tel" id="telefone" name="telefone" required class="form-field__input" placeholder="(00) 00000-0000" maxlength="15">
                             </div>
-                        </div>
-                        <!-- Líquido e Queda -->
-                        <div class="flex items-center space-x-4">
-                            <label class="text-xs font-semibold text-gray-700">Teve contato com líquido?</label>
-                            <div class="flex items-center space-x-2">
-                                <input type="radio" name="contato_liquido" id="liquid-yes" value="sim" class="rounded text-lime-500 focus:ring-lime-500">
-                                <label for="liquid-yes">Sim</label>
+                            <div class="form-field md:col-span-3">
+                                <label for="email" class="form-field__label">Email:</label>
+                                <input type="email" id="email" name="email" class="form-field__input" placeholder="email@exemplo.com">
                             </div>
-                            <div class="flex items-center space-x-2">
-                                <input type="radio" name="contato_liquido" id="liquid-no" value="nao" checked class="rounded text-lime-500 focus:ring-lime-500">
-                                <label for="liquid-no">Não</label>
+
+                            <!-- Linha 3: Endereço (50%) + Número (20%) + Complemento (30%) -->
+                            <!-- Total: 6+2+4 = 12 colunas (100%) -->
+                            <div class="form-field md:col-span-6">
+                                <label for="endereco" class="form-field__label">Endereço:</label>
+                                <input type="text" id="endereco" name="endereco" class="form-field__input" placeholder="Rua, Avenida, etc.">
                             </div>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <label class="text-xs font-semibold text-gray-700">Sofreu queda ou batida?</label>
-                            <div class="flex items-center space-x-2">
-                                <input type="radio" name="queda_batida" id="fall-yes" value="sim" class="rounded text-lime-500 focus:ring-lime-500">
-                                <label for="fall-yes">Sim</label>
+                            <div class="form-field md:col-span-2">
+                                <label for="numero" class="form-field__label">Nº: <span class="required">*</span></label>
+                                <input type="text" id="numero" name="numero" required class="form-field__input" placeholder="123">
                             </div>
-                            <div class="flex items-center space-x-2">
-                                <input type="radio" name="queda_batida" id="fall-no" value="nao" checked class="rounded text-lime-500 focus:ring-lime-500">
-                                <label for="fall-no">Não</label>
+                            <div class="form-field md:col-span-4">
+                                <label for="complemento" class="form-field__label">Compl.:</label>
+                                <input type="text" id="complemento" name="complemento" class="form-field__input" placeholder="Apto, Bloco, etc.">
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        </div>
 
-        <!-- 1. OBSERVAÇÕES -->
-        <div class="mt-4 page-break-section" style="border-top: 2px solid #84cc16;">
-            <div class="bg-gray-200 p-2">
-                <span style="font-size: 10px; font-weight: bold; color: #111;">OBSERVAÇÕES SOBRE A CONDIÇÃO FÍSICA DO APARELHO NO RECEBIMENTO</span>
-            </div>
-            <div class="p-4 border-2 border-gray-300">
-                <textarea id="observacoes" name="observacoes" rows="3" style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
-            </div>
-        </div>
+                <!-- Device Data Section -->
+                <div class="os-form__section">
+                    <div class="os-form__section-header">
+                        <h3 class="os-form__section-title">DADOS DO APARELHO</h3>
+                    </div>
+                    <div class="os-form__section-content">
+                        <div class="dados-grid">
+                            <!-- Linha 1: Marca (20%) + Modelo (30%) + Cor (20%) + IMEI (30%) -->
+                            <!-- Total: 2+4+2+4 = 12 colunas (100%) -->
+                            <div class="form-field md:col-span-2">
+                                <label for="marca" class="form-field__label">Marca: <span class="required">*</span></label>
+                                <input type="text" id="marca" name="marca" required class="form-field__input" placeholder="Ex: Samsung, Apple, Xiaomi">
+                            </div>
+                            <div class="form-field md:col-span-4">
+                                <label for="modelo" class="form-field__label">Modelo: <span class="required">*</span></label>
+                                <input type="text" id="modelo" name="modelo" required class="form-field__input" placeholder="Ex: Galaxy S21, iPhone 12, Redmi Note 10">
+                            </div>
+                            <div class="form-field md:col-span-2">
+                                <label for="cor" class="form-field__label">Cor:</label>
+                                <input type="text" id="cor" name="cor" class="form-field__input" placeholder="Ex: Preto, Branco">
+                            </div>
+                            <div class="form-field md:col-span-4">
+                                <label for="imei" class="form-field__label">IMEI:</label>
+                                <input type="text" id="imei" name="imei" class="form-field__input" placeholder="000000000000000 (15 dígitos)" maxlength="15">
+                            </div>
 
-        <!-- 2. PROBLEMA -->
-        <div class="mt-4" style="border-top: 2px solid #84cc16;">
-            <div class="bg-gray-200 p-2">
-                <span style="font-size: 10px; font-weight: bold; color: #111;">PROBLEMA RELATADO PELO CLIENTE</span>
-            </div>
-            <div class="p-4 border-2 border-gray-300">
-                <textarea id="problema" name="problema" required rows="3" style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
-            </div>
-        </div>
+                            <!-- Linha 2: Senha de acesso (100%) -->
+                            <div class="form-field md:col-span-12">
+                                <label for="senha" class="form-field__label">Senha de acesso: <span class="required">*</span></label>
+                                <input type="text" id="senha" name="senha" required class="form-field__input" placeholder="Senha do aparelho">
+                            </div>
+                        </div>
 
-        <!-- 3. APROVAÇÃO -->
-        <div class="mt-4" style="border-top: 2px solid #84cc16;">
-            <div class="bg-gray-200 p-2">
-                <span style="font-size: 10px; font-weight: bold; color: #111;">APROVAÇÃO DO ORÇAMENTO E PRAZO DE RETIRADA</span>
-            </div>
-            <div class="p-4 border-2 border-gray-300">
-                <p style="font-size: 10px; margin-bottom: 8px;">O valor do serviço será informado ao cliente conforme o número de celular ou email fornecido nesta ordem de serviço. O orçamento não se aplica a reparos cobertos pela garantia do fabricante, pois não geram custos. O prazo legal para a conclusão do serviço é de 30 dias, independentemente de o reparo ser ou não coberto pela garantia, conforme o Código de Defesa do Consumidor. Se não houver aprovação ou retorno do cliente em 7 dias, o serviço será cancelado e o aparato ficará disponível para retirada.</p>
-                <div style="font-size: 10px; font-weight: bold; margin-bottom: 5px; display: flex; gap: 10px;">
-                    <div style="width: 50%;">DATA DE ENTRADA <input type="text" id="data-entrada" name="data_entrada" required placeholder="dd/mm/aaaa" maxlength="10" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px; width: 100%;"></div>
-                    <div style="width: 50%;">DATA DE SAÍDA <input type="text" id="data-saida" name="data_saida" placeholder="    " maxlength="10" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px; width: 100%;"></div>
+                        <!-- Acessórios e Condições -->
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <h4 class="form-field__label mb-3" style="font-size: 0.75rem; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.05em;">Acessórios e Estado do Aparelho</h4>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Coluna Esquerda: Acessórios -->
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <label class="form-field__label mb-0">Chip:</label>
+                                        <div class="radio-group">
+                                            <label class="radio-group__item">
+                                                <input type="radio" name="chip" id="chip-entregue" value="entregue" class="radio-group__input">
+                                                <span class="radio-group__label">Entregue</span>
+                                            </label>
+                                            <label class="radio-group__item">
+                                                <input type="radio" name="chip" id="chip-ficou" value="ficou" checked class="radio-group__input">
+                                                <span class="radio-group__label">Ficou</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <label class="form-field__label mb-0">Capa:</label>
+                                        <div class="radio-group">
+                                            <label class="radio-group__item">
+                                                <input type="radio" name="capa" id="capa-entregue" value="entregue" class="radio-group__input">
+                                                <span class="radio-group__label">Entregue</span>
+                                            </label>
+                                            <label class="radio-group__item">
+                                                <input type="radio" name="capa" id="capa-ficou" value="ficou" checked class="radio-group__input">
+                                                <span class="radio-group__label">Ficou</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <label class="form-field__label mb-0">Cartão SD:</label>
+                                        <div class="radio-group">
+                                            <label class="radio-group__item">
+                                                <input type="radio" name="sd_card" id="sd-card-entregue" value="entregue" class="radio-group__input">
+                                                <span class="radio-group__label">Entregue</span>
+                                            </label>
+                                            <label class="radio-group__item">
+                                                <input type="radio" name="sd_card" id="sd-card-ficou" value="ficou" checked class="radio-group__input">
+                                                <span class="radio-group__label">Ficou</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Coluna Direita: Danos -->
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <label class="form-field__label mb-0">Contato com líquido:</label>
+                                        <div class="radio-group">
+                                            <label class="radio-group__item">
+                                                <input type="radio" name="contato_liquido" id="liquid-yes" value="sim" class="radio-group__input">
+                                                <span class="radio-group__label">Sim</span>
+                                            </label>
+                                            <label class="radio-group__item">
+                                                <input type="radio" name="contato_liquido" id="liquid-no" value="nao" checked class="radio-group__input">
+                                                <span class="radio-group__label">Não</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <label class="form-field__label mb-0">Queda ou batida:</label>
+                                        <div class="radio-group">
+                                            <label class="radio-group__item">
+                                                <input type="radio" name="queda_batida" id="fall-yes" value="sim" class="radio-group__input">
+                                                <span class="radio-group__label">Sim</span>
+                                            </label>
+                                            <label class="radio-group__item">
+                                                <input type="radio" name="queda_batida" id="fall-no" value="nao" checked class="radio-group__input">
+                                                <span class="radio-group__label">Não</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Senha Desenho -->
+                            <div class="mt-4 flex flex-col items-center">
+                                <label class="form-field__label mb-2">Padrão da Senha (desenho)</label>
+                                <div id="password-pattern-container" class="password-pattern"></div>
+                                <input type="hidden" id="password-pattern" name="password_pattern" value="">
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div style="margin-top: 5px;">
-                    <label style="font-size: 10px; font-weight: bold;">RESPONSÁVEL PELA RETIRADA DO APARELHO:</label>
-                    <input type="text" id="responsavel-retirada" name="responsavel_retirada" style="margin-top: 3px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; width: 100%;">
-                </div>
-            </div>
-        </div>
 
-        <!-- 4. ASSINATURA -->
-        <div class="mt-4" style="border-top: 2px solid #84cc16;">
-            <div class="bg-gray-200 p-2">
-                <span style="font-size: 10px; font-weight: bold; color: #111;">ASSINATURA E CONCORDÂNCIA</span>
-            </div>
-            <div class="p-4 border-2 border-gray-300">
-                <div style="font-size: 10px; font-weight: bold;">
-                    <div style="margin-bottom: 8px;">ASSINATURA DO CLIENTE:<div style="border-bottom: 2px solid #666; height: 40px;"></div></div>
-                    <div>NOME E ASSINATURA DO GERENTE RESPONSÁVEL:<div style="border-bottom: 2px solid #666; height: 40px;"></div></div>
+                <!-- Observations Section -->
+                <div class="os-form__section">
+                    <div class="os-form__section-header">
+                        <span class="os-form__section-title">OBSERVAÇÕES DO RECEBIMENTO</span>
+                    </div>
+                    <div class="os-form__section-content">
+                        <textarea id="observacoes" name="observacoes" class="form-field__textarea" rows="3" placeholder="Descreva o estado físico do appareilho (riscos, amassados, tela trincada, etc.)"></textarea>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- 5. TEXTO UNIDADES -->
-        <div class="mt-4 p-4" style="border-top: 2px solid #84cc16; border: 2px solid #ccc; font-size: 10px; color: #666;">
-            <p>Este termo de serviço é válido para todas as unidades da rede Miplace, que operam sob suas respectivas razões sociais e CNPJs. As unidades são: a da Rua Quinze de Novembro, 910, operada por Fernandes Comércio de Celulares e Importação LTDA (CNPJ: 13.787.408/0001-05); a da Rua Dom Pedro II, 857, operada por Jackcell Celulares e Importados LTDA (CNPJ: 34.511.185/0001-10); a da Rua Benjamin Constant, 1230, operada por Filipe Almeida Gil de Souza LTDA (CNPJ: 44.739.622/0001-01); a da Rua Treze de Maio, 218, Loja 09, operada por Mi Place Amparo LTDA (CNPJ: 58.495.100/0001-16); e a da Rua Treze de Maio, 26, operada por J. de A. Fernandes Operações de Crédito (CNPJ: 58.186.781/0001-30).</p>
-        </div>
-        </form>
-        
-        <!-- Botões de Ação -->
-        <div class="download-button flex justify-center gap-4 mt-6">
-            <button onclick="imprimirOS()" class="bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
-                Imprimir
-            </button>
-            <button onclick="downloadPDF()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
-                Download PDF
-            </button>
-            <button onclick="limparFormulario()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
-                Limpar
-            </button>
-        </div>
+                <!-- Problem Reported Section -->
+                <div class="os-form__section">
+                    <div class="os-form__section-header">
+                        <span class="os-form__section-title">PROBLEMA RELATADO</span>
+                    </div>
+                    <div class="os-form__section-content">
+                        <textarea id="problema" name="problema" class="form-field__textarea" rows="3" placeholder="Descreva o problema relatado pelo cliente"></textarea>
+                    </div>
+                </div>
+
+                <!-- Budget Approval Section -->
+                <div class="os-form__section">
+                    <div class="os-form__section-header">
+                        <span class="os-form__section-title">ORÇAMENTO E PRAZOS</span>
+                    </div>
+                    <div class="os-form__section-content">
+                        <p class="text-xs mb-3">O valor do serviço será informado ao cliente conforme o número de celular ou email fornecido. O prazo legal para conclusão é de 30 dias, independentemente do tipo de reparo. Se não houver aprovação ou retorno em 7 dias, o serviço será cancelado e o aparelho ficará disponível para retirada.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                            <div class="form-field">
+                                <label for="data-entrada" class="form-field__label">Data de Entrada:</label>
+                                <input type="text" id="data-entrada" name="data_entrada" class="form-field__input" placeholder="dd/mm/aaaa" maxlength="10">
+                            </div>
+                            <div class="form-field">
+                                <label for="data-saida" class="form-field__label">Data de Saída:</label>
+                                <input type="text" id="data-saida" name="data_saida" class="form-field__input" placeholder="dd/mm/aaaa" maxlength="10">
+                            </div>
+                        </div>
+                        <div class="form-field">
+                            <label for="responsavel-retirada" class="form-field__label">Responsável pela Retirada:</label>
+                            <input type="text" id="responsavel-retirada" name="responsavel_retirada" class="form-field__input" placeholder="Nome completo da pessoa autorizada">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Signature Section -->
+                <div class="os-form__section">
+                    <div class="os-form__section-header">
+                        <span class="os-form__section-title">ASSINATURAS</span>
+                    </div>
+                    <div class="os-form__section-content">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <p class="form-field__label mb-2">Cliente:</p>
+                                <div class="signature-line"></div>
+                            </div>
+                            <div>
+                                <p class="form-field__label mb-2">Responsável MiPlace:</p>
+                                <div class="signature-line"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Units Information -->
+                <div class="units-text p-4 border border-gray-200">
+                    <p><strong>Termo válido para todas as unidades da rede MiPlace:</strong> Rua Quinze de Novembro, 910 (Fernandes Comércio - CNPJ 13.787.408/0001-05); Rua Dom Pedro II, 857 (Jackcell Celulares - CNPJ 34.511.185/0001-10); Rua Benjamin Constant, 1230 (Filipe Almeida - CNPJ 44.739.622/0001-01); Rua Treze de Maio, 218, Loja 09 (Mi Place Amparo - CNPJ 58.495.100/0001-16); Rua Treze de Maio, 26 (J. de A. Fernandes - CNPJ 58.186.781/001-30).</p>
+                </div>
+            </form>
+
+            <!-- Action Buttons -->
+            <div class="download-button flex justify-center gap-4 mt-6">
+                <button type="button" onclick="UIController.print()" class="btn">
+                    Imprimir
+                </button>
+                <button type="button" onclick="PDFGenerator.generate()" class="btn btn-secondary">
+                    Download PDF
+                </button>
+                <button type="button" onclick="FormHandler.clear()" class="btn btn-gray">
+                    Limpar
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- Modal pós-impressão -->
-    <div id="post-print-modal" class="modal-overlay" style="display: none;">
+    <!-- Post-Print Modal -->
+    <div id="post-print-modal" class="modal-overlay hidden">
         <div class="modal-card">
             <div class="modal-icon">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -400,25 +381,29 @@
             <h3 class="modal-title">Impressão concluída!</h3>
             <p class="modal-description">O que deseja fazer agora?</p>
             <div class="modal-actions">
-                <button onclick="reimprimirOS()" class="modal-btn modal-btn-primary">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                        <rect x="6" y="14" width="12" height="8"></rect>
-                    </svg>
+                <button type="button" onclick="UIController.reprint()" class="modal-btn modal-btn-primary">
                     Reimprimir
                 </button>
-                <button onclick="novaOSPosImpressao()" class="modal-btn modal-btn-secondary">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
+                <button type="button" onclick="UIController.startNewOS()" class="modal-btn modal-btn-secondary">
                     Nova O.S.
                 </button>
             </div>
         </div>
     </div>
 
-    <script src="script.js" defer></script>
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
+
+    <!-- Scripts -->
+    <script src="src/js/masks.js"></script>
+    <script src="src/js/storage.js"></script>
+    <script src="src/js/cep.js"></script>
+    <script src="src/js/numberGenerator.js"></script>
+    <script src="src/js/ui.js"></script>
+    <script src="src/js/form.js"></script>
+    <script src="src/js/pdf.js"></script>
+    <script src="src/js/passwordPattern.js"></script>
+    <script src="src/js/app.js"></script>
+
 </body>
 </html>
